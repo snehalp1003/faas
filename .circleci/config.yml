@@ -1,0 +1,69 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - checkout
+      - run:
+          name: Install packages
+          command: |
+            sudo apt-get update && sudo apt-get install wget zip unzip python-pip python-dev build-essential -y
+            python --version
+      - run:
+          name: Install awscli
+          command: sudo pip install awscli
+      - run:
+          name: Build Artifact
+          command: |
+            ls -al
+            echo "Building the artifact with Maven"
+            mvn clean install
+            cd target
+            ls -al
+            cd ../..
+            pwd
+      - run:
+          name: Zip Artifact
+          command: |
+            echo "Current build number is ${CIRCLE_BUILD_NUM}"
+            echo "Current directory"
+            pwd
+            echo "Current directory content"
+            ls -al
+            echo "Making the webapp_artifact directory"
+            mkdir -p faas_artifact
+            echo "Changing directory to faas_artifact"
+            cd faas_artifact
+            echo "Copying the jar file from ../target/faas-0.0.1-SNAPSHOT.jar to the faas_artifact"
+            cp ../target/faas-0.0.1-SNAPSHOT.jar .
+            echo "current directory content"
+            ls -al
+            pwd
+            echo "Changing directory to root"
+            cd ..
+            pwd
+            ls -al
+      - run:
+          name: Upload Artifact to S3 Bucket
+          command: |
+            echo "Uploading artifact to S3 bucket ${CODE_DEPLOY_S3_BUCKET}"
+            cd faas_artifact
+            aws s3 cp faas-0.0.1-SNAPSHOT.jar s3://${CODE_DEPLOY_S3_BUCKET}
+            cd ..
+      - run:
+          name: Update AWS Lambda Function
+          command: |
+            aws configure set region ${AWS_REGION}
+            echo "Updating AWS Lambda Function"
+            aws lambda update-function-code --function-name SendEmailOnSNS --s3-bucket ${CODE_DEPLOY_S3_BUCKET} --region ${AWS_REGION} faas-0.0.1-SNAPSHOT.jar
+
+workflows:
+  version: 2
+  faas-workflow:
+    jobs:
+    - build:
+          filters:
+            branches:
+              only:
+                - master
