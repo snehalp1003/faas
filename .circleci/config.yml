@@ -56,7 +56,7 @@ jobs:
           command: |
             aws configure set region ${AWS_REGION}
             echo "Updating AWS Lambda Function"
-            aws lambda update-function-code --function-name SendEmailOnSNS --s3-bucket ${CODE_DEPLOY_S3_BUCKET} --s3-key faas-0.0.1-SNAPSHOT.jar --region ${AWS_REGION}
+            aws lambda update-function-code --function-name SendEmailOnSNS --s3-bucket ${CODE_DEPLOY_S3_BUCKET} --s3-key faas-0.0.1-SNAPSHOT.jar --region ${AWS_REGION} > lambdaLogs.txt
 
 workflows:
   version: 2
