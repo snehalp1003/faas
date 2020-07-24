@@ -42,7 +42,7 @@ public class SendEmailEvent {
     static final String EMAIL_FROM = fromEmailAddress;
     static final String EMAIL_SUBJECT = "Reset Password Link";
     private static final String EMAIL_BODY = "Below is the link for password reset :- ";
-    long timeToLive = Instant.now().getEpochSecond() + 60 * 60;
+    long timeToLive = Instant.now().getEpochSecond() + 2 * 60;
 
     public SendEmailEvent() {
         AmazonDynamoDBClient client = new AmazonDynamoDBClient();
@@ -107,6 +107,7 @@ public class SendEmailEvent {
                                 .withSubject(new Content().withCharset("UTF-8").withData(EMAIL_SUBJECT)))
                         .withSource(EMAIL_FROM);
                 client.sendEmail(emailRequest);
+                logger.log("***************Email Request: " + emailRequest.toString() + " ***************");
                 logger.log("Email sent to recipient successfully!");
             } catch (Exception ex) {
                 ex.printStackTrace();
