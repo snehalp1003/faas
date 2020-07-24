@@ -42,7 +42,6 @@ public class SendEmailEvent {
     static String EMAIL_FROM = System.getenv("fromEmailAddress");
     static final String EMAIL_SUBJECT = "Reset Password Link";
     private static final String EMAIL_BODY = "Below is the link for password reset :- ";
-    long timeToLive = Instant.now().getEpochSecond() + 15 * 60;
 
     public SendEmailEvent() {
         AmazonDynamoDBClient client = new AmazonDynamoDBClient();
@@ -51,6 +50,8 @@ public class SendEmailEvent {
     }
 
     public Object handleRequest(SNSEvent request, Context context) {
+        
+        long timeToLive = Instant.now().getEpochSecond() + 15 * 60;
 
         LambdaLogger logger = context.getLogger();
 
