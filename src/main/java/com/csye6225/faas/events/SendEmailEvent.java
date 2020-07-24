@@ -39,7 +39,7 @@ public class SendEmailEvent {
 
     private DynamoDB amazonDynamoDB;
     private final String tableName = "csye6225";
-    static final String EMAIL_FROM = "donotreply@prod.snehalpatel.me";
+    static String EMAIL_FROM = System.getenv("fromEmailAddress");
     static final String EMAIL_SUBJECT = "Reset Password Link";
     private static final String EMAIL_BODY = "Below is the link for password reset :- ";
     long timeToLive = Instant.now().getEpochSecond() + 2 * 60;
@@ -82,8 +82,8 @@ public class SendEmailEvent {
         logger.log("***************Token: " + token + " ***************");
 
         Item item = amazonDynamoDB.getTable(tableName).getItem("id", emailTo);
-        if ((item != null && Long.parseLong(item.get("TTL").toString()) < Instant.now().getEpochSecond()
-                || item == null)) {
+        if ((item != null && Long.parseLong(item.get("TTL").toString()) < Instant.now().getEpochSecond())
+                || item == null) {
             amazonDynamoDB.getTable(tableName).putItem(new PutItemSpec().withItem(
                     new Item().withPrimaryKey("id", emailTo).withString("token", token).withLong("TTL", timeToLive)));
 
@@ -99,6 +99,9 @@ public class SendEmailEvent {
             Content content = new Content().withData(stringBuilder.toString());
             Body body = new Body().withText(content);
             try {
+                if (EMAIL_FROM == null) {
+                    EMAIL_FROM = "donotreply@prod.snehalpatel.me";
+                }
                 AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder.standard()
                         .withRegion(Regions.US_EAST_1).build();
                 SendEmailRequest emailRequest = new SendEmailRequest()
