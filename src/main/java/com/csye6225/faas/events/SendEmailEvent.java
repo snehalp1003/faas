@@ -42,7 +42,7 @@ public class SendEmailEvent {
     static String EMAIL_FROM = System.getenv("fromEmailAddress");
     static final String EMAIL_SUBJECT = "Reset Password Link";
     private static final String EMAIL_BODY = "Below is the link for password reset :- ";
-    long timeToLive = Instant.now().getEpochSecond() + 2 * 60;
+    long timeToLive = Instant.now().getEpochSecond() + 15 * 60;
 
     public SendEmailEvent() {
         AmazonDynamoDBClient client = new AmazonDynamoDBClient();
