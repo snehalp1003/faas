@@ -39,7 +39,7 @@ public class SendEmailEvent {
 
     private DynamoDB amazonDynamoDB;
     private final String tableName = "csye6225";
-    static final String EMAIL_FROM = fromEmailAddress;
+    static final String EMAIL_FROM = "donotreply@prod.snehalpatel.me";
     static final String EMAIL_SUBJECT = "Reset Password Link";
     private static final String EMAIL_BODY = "Below is the link for password reset :- ";
     long timeToLive = Instant.now().getEpochSecond() + 2 * 60;
