@@ -77,12 +77,14 @@ public class SendEmailEvent {
 
         String requestsFromSQS = request.getRecords().get(0).getSNS().getMessage();
         String emailTo = requestsFromSQS.split(",")[0];
+        logger.log("***************Email To: " + emailTo + " ***************");
         String token = requestsFromSQS.split(",")[1];
+        logger.log("***************Token: " + token + " ***************");
 
-        Item item = amazonDynamoDB.getTable("dynamoDBTable").getItem("id", emailTo);
+        Item item = amazonDynamoDB.getTable(tableName).getItem("id", emailTo);
         if ((item != null && Long.parseLong(item.get("TTL").toString()) < Instant.now().getEpochSecond()
                 || item == null)) {
-            amazonDynamoDB.getTable("dynamoDBTable").putItem(new PutItemSpec().withItem(
+            amazonDynamoDB.getTable(tableName).putItem(new PutItemSpec().withItem(
                     new Item().withPrimaryKey("id", emailTo).withString("token", token).withLong("TTL", timeToLive)));
 
             StringBuilder stringBuilder = new StringBuilder();
