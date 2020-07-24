@@ -84,7 +84,7 @@ public class SendEmailEvent {
         String word = "token=";
         int tokenUUIDPosition = token.lastIndexOf(word);
         int startIndex = tokenUUIDPosition + 6;
-        int endIndex = tokenUUIDPosition + 36;
+        int endIndex = startIndex + 36;
         String tokenUUID = token.substring(startIndex, endIndex);
         logger.log("***************Token UUID: " + tokenUUID + " ***************");
 
