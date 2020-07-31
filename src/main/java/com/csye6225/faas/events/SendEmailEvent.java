@@ -50,7 +50,7 @@ public class SendEmailEvent {
     }
 
     public Object handleRequest(SNSEvent request, Context context) {
-        
+
         long timeToLive = Instant.now().getEpochSecond() + 15 * 60;
 
         LambdaLogger logger = context.getLogger();
@@ -91,8 +91,8 @@ public class SendEmailEvent {
         Item item = amazonDynamoDB.getTable(tableName).getItem("id", emailTo);
         if ((item != null && Long.parseLong(item.get("TTL").toString()) < Instant.now().getEpochSecond())
                 || item == null) {
-            amazonDynamoDB.getTable(tableName).putItem(new PutItemSpec().withItem(
-                    new Item().withPrimaryKey("id", emailTo).withString("token", tokenUUID).withLong("TTL", timeToLive)));
+            amazonDynamoDB.getTable(tableName).putItem(new PutItemSpec().withItem(new Item()
+                    .withPrimaryKey("id", emailTo).withString("token", tokenUUID).withLong("TTL", timeToLive)));
 
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(EMAIL_BODY + "\n");
@@ -103,8 +103,10 @@ public class SendEmailEvent {
                 stringBuilder.append(forgotPasswordLinks[index]);
             }
 
-            Content content = new Content().withData(stringBuilder.toString());
-            Body body = new Body().withText(content);
+            // Content content = new Content().withData(stringBuilder.toString());
+            // Body body = new Body().withText(content);
+            Content content = new Content().withCharset("UTF-8").withData(stringBuilder.toString());
+            Body body = new Body().withHtml(content);
             try {
                 if (EMAIL_FROM == null) {
                     EMAIL_FROM = "donotreply@prod.snehalpatel.me";
